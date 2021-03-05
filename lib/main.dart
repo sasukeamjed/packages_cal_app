@@ -49,6 +49,7 @@ class _MyHomePageState extends State<MyHomePage> {
   int numOfBigPackages = 0;
   double priceOfSmallPackages = 0.0;
   double priceOfBigPackages = 0.0;
+  double bonusPrice = 0.0;
 
   @override
   Widget build(BuildContext context) {
@@ -143,6 +144,10 @@ class _MyHomePageState extends State<MyHomePage> {
               SizedBox(
                 height: 20,
               ),
+              Text("The Bonus Price:\n${bonusPrice.toStringAsFixed(3)} OMR", textAlign: TextAlign.center,),
+              SizedBox(
+                height: 20,
+              ),
               Text("The Total Price Of Packages:\n${(priceOfSmallPackages + priceOfBigPackages).toStringAsFixed(3)} OMR", textAlign: TextAlign.center,),
             ],
           ),
@@ -155,22 +160,58 @@ class _MyHomePageState extends State<MyHomePage> {
 
     double smallPack = 0;
     double bigPack = 0;
+    double bigPackagesPrice = 0;
 
-    packages.forEach((value) {
-      int indexOfSlash = value.indexOf("/");
-      int numOfPackages = int.parse(value.substring(0, indexOfSlash));
-      if(numOfPackages > 1){
-        bigPack += 1;
-      }else{
-        smallPack += 1;
+
+
+    packages.asMap().forEach((index, value) {
+      print(value);
+      if(value.contains("/")){
+
+        int indexOfSlash = value.indexOf("/");
+        int numOfPackages = int.parse(value.substring(0, indexOfSlash));
+        print(index);
+        if(numOfPackages > 1){
+          bigPackagesPrice = bigPackagesPrice + calculateBigPackagePrices(numOfPackages);
+          bigPack += 1;
+        }else{
+          smallPack += 1;
+        }
+
       }
+      else if(value.contains("\\")){
+        int indexOfSlash = value.indexOf("\\");
+        int numOfPackages = int.parse(value.substring(0, indexOfSlash));
+        print(index);
+        if(numOfPackages > 1){
+          bigPackagesPrice = bigPackagesPrice + calculateBigPackagePrices(numOfPackages);
+          bigPack += 1;
+        }else{
+          smallPack += 1;
+        }
+      }else{
+        print("There is error on line $index with vlaue is $value");
+      }
+
+
     });
 
     return {
       "small packages" : smallPack,
       "small packages price" : (smallPack * 0.050),
       "big packages" : bigPack,
-      "big packages price" : (bigPack * 0.150),
+      "big packages price" : bigPackagesPrice,
     };
+  }
+
+  double calculateBigPackagePrices(int numOfPackages){
+    if(numOfPackages < 5){
+      return numOfPackages * 0.150;
+    }else{
+      int extraPackages = numOfPackages - 4;
+      double bonus = (0.025 * extraPackages);
+      bonusPrice = bonusPrice + bonus;
+      return 0.150 + bonus;
+    }
   }
 }
