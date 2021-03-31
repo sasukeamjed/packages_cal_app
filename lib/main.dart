@@ -1,12 +1,16 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pdfWidgets;
 
 void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -14,10 +18,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      builder: (context, child){
+      builder: (context, child) {
         return Scaffold(
           body: GestureDetector(
-            onTap: (){
+            onTap: () {
               hideKeyboard(context);
             },
             child: child,
@@ -37,12 +41,56 @@ class MyApp extends StatelessWidget {
 }
 
 class MyHomePage extends StatefulWidget {
-
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  final pdf = pdfWidgets.Document();
+
+  writeOnPdf() {
+    pdf.addPage(
+      pdfWidgets.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        margin: pdfWidgets.EdgeInsets.all(32),
+        build: (pdfWidgets.Context context){
+          return <pdfWidgets.Widget>  [
+            pdfWidgets.Header(
+              level: 0,
+              child: pdfWidgets.Text("Easy Approach Document"),
+            ),
+            pdfWidgets.Paragraph(
+              text: "A paragraph is a series of related sentences developing a central idea, called the topic. Try to think about paragraphs in terms of thematic unity: a paragraph is a sentence or a group of sentences that supports one central, unified idea. Paragraphs add one idea at a time to your broader argument.",
+            ),
+            pdfWidgets.Paragraph(
+              text: "A paragraph is a series of related sentences developing a central idea, called the topic. Try to think about paragraphs in terms of thematic unity: a paragraph is a sentence or a group of sentences that supports one central, unified idea. Paragraphs add one idea at a time to your broader argument.",
+            ),
+            pdfWidgets.Header(
+              level: 1,
+              child: pdfWidgets.Text("Second Heading"),
+            ),
+            pdfWidgets.Paragraph(
+              text: "A paragraph is a series of related sentences developing a central idea, called the topic. Try to think about paragraphs in terms of thematic unity: a paragraph is a sentence or a group of sentences that supports one central, unified idea. Paragraphs add one idea at a time to your broader argument.",
+            ),
+            pdfWidgets.Paragraph(
+              text: "A paragraph is a series of related sentences developing a central idea, called the topic. Try to think about paragraphs in terms of thematic unity: a paragraph is a sentence or a group of sentences that supports one central, unified idea. Paragraphs add one idea at a time to your broader argument.",
+            ),
+          ];
+        },
+        
+      ),
+    );
+  }
+
+  Future savePdf() async{
+    Directory documentDirectory = await getApplicationDocumentsDirectory();
+
+    String documentPath = documentDirectory.path;
+
+    File file = File("$documentPath/example.pdf");
+
+    file.writeAsBytesSync(pdf.save());
+  }
 
   TextEditingController _controller = TextEditingController();
   int numOfSmallPackages = 0;
@@ -63,21 +111,25 @@ class _MyHomePageState extends State<MyHomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              Image.asset('logo/logo-small.png', height: 200, width: 200,),
+              Image.asset(
+                'logo/logo-small.png',
+                height: 200,
+                width: 200,
+              ),
               SizedBox(
                 height: 20,
               ),
               Text(
                 'Enter the number of the product with packages:',
               ),
-             TextField(
-               controller: _controller,
-               keyboardType: TextInputType.multiline,
-               maxLines: null,
-               decoration: InputDecoration(
-                 hintText: "x/xxxxxxx",
-               ),
-             ),
+              TextField(
+                controller: _controller,
+                keyboardType: TextInputType.multiline,
+                maxLines: null,
+                decoration: InputDecoration(
+                  hintText: "x/xxxxxxx",
+                ),
+              ),
               SizedBox(
                 height: 20,
               ),
@@ -86,10 +138,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 children: [
                   ElevatedButton(
                     child: Text("Calculate"),
-                    onPressed: (){
-                      num lines = '\n'.allMatches(_controller.text.trim()).length + 1;
-                      List<String> packages = _controller.text.split("\n").where((element) => element != "").toList();
-                      Map<String, double> map = calcBigAndSmallPackages(packages);
+                    onPressed: () {
+                      num lines =
+                          '\n'.allMatches(_controller.text.trim()).length + 1;
+                      List<String> packages = _controller.text
+                          .split("\n")
+                          .where((element) => element != "")
+                          .toList();
+                      Map<String, double> map =
+                          calcBigAndSmallPackages(packages);
                       setState(() {
                         numOfSmallPackages = map["small packages"].toInt();
                         priceOfSmallPackages = map["small packages price"];
@@ -106,15 +163,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   ElevatedButton(
                     child: Text("Clear"),
-                    onPressed: (){
-
+                    onPressed: () {
                       setState(() {
                         _controller.clear();
                         numOfSmallPackages = 0;
                         priceOfSmallPackages = 0;
                         numOfBigPackages = 0;
                         priceOfBigPackages = 0;
-
                       });
                     },
                   ),
@@ -124,31 +179,52 @@ class _MyHomePageState extends State<MyHomePage> {
                 height: 20,
               ),
               //To do next round number to 3 decemal places
-              Text("Number Of Small Packages:\n$numOfSmallPackages", textAlign: TextAlign.center,),
+              Text(
+                "Number Of Small Packages:\n$numOfSmallPackages",
+                textAlign: TextAlign.center,
+              ),
               SizedBox(
                 height: 20,
               ),
-              Text("Number Of Big Packages:\n$numOfBigPackages", textAlign: TextAlign.center,),
+              Text(
+                "Number Of Big Packages:\n$numOfBigPackages",
+                textAlign: TextAlign.center,
+              ),
               SizedBox(
                 height: 20,
               ),
-              Text("Total Packages:\n${numOfBigPackages + numOfSmallPackages}", textAlign: TextAlign.center,),
+              Text(
+                "Total Packages:\n${numOfBigPackages + numOfSmallPackages}",
+                textAlign: TextAlign.center,
+              ),
               SizedBox(
                 height: 20,
               ),
-              Text("The Total Price Of Small Packages:\n${priceOfSmallPackages.toStringAsFixed(3)} OMR", textAlign: TextAlign.center,),
+              Text(
+                "The Total Price Of Small Packages:\n${priceOfSmallPackages.toStringAsFixed(3)} OMR",
+                textAlign: TextAlign.center,
+              ),
               SizedBox(
                 height: 20,
               ),
-              Text("The Total Price Of Big Packages:\n${priceOfBigPackages.toStringAsFixed(3)} OMR", textAlign: TextAlign.center,),
+              Text(
+                "The Total Price Of Big Packages:\n${priceOfBigPackages.toStringAsFixed(3)} OMR",
+                textAlign: TextAlign.center,
+              ),
               SizedBox(
                 height: 20,
               ),
-              Text("The Bonus Price:\n${bonusPrice.toStringAsFixed(3)} OMR", textAlign: TextAlign.center,),
+              Text(
+                "The Bonus Price:\n${bonusPrice.toStringAsFixed(3)} OMR",
+                textAlign: TextAlign.center,
+              ),
               SizedBox(
                 height: 20,
               ),
-              Text("The Total Price Of Packages:\n${(priceOfSmallPackages + priceOfBigPackages).toStringAsFixed(3)} OMR", textAlign: TextAlign.center,),
+              Text(
+                "The Total Price Of Packages:\n${(priceOfSmallPackages + priceOfBigPackages).toStringAsFixed(3)} OMR",
+                textAlign: TextAlign.center,
+              ),
             ],
           ),
         ),
@@ -156,58 +232,52 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Map<String, double> calcBigAndSmallPackages(List<String> packages){
-
+  Map<String, double> calcBigAndSmallPackages(List<String> packages) {
     double smallPack = 0;
     double bigPack = 0;
     double bigPackagesPrice = 0;
 
-
-
     packages.asMap().forEach((index, value) {
       print(value);
-      if(value.contains("/")){
-
+      if (value.contains("/")) {
         int indexOfSlash = value.indexOf("/");
         int numOfPackages = int.parse(value.substring(0, indexOfSlash));
         print(index);
-        if(numOfPackages > 1){
-          bigPackagesPrice = bigPackagesPrice + calculateBigPackagePrices(numOfPackages);
+        if (numOfPackages > 1) {
+          bigPackagesPrice =
+              bigPackagesPrice + calculateBigPackagePrices(numOfPackages);
           bigPack += 1;
-        }else{
+        } else {
           smallPack += 1;
         }
-
-      }
-      else if(value.contains("\\")){
+      } else if (value.contains("\\")) {
         int indexOfSlash = value.indexOf("\\");
         int numOfPackages = int.parse(value.substring(0, indexOfSlash));
         print(index);
-        if(numOfPackages > 1){
-          bigPackagesPrice = bigPackagesPrice + calculateBigPackagePrices(numOfPackages);
+        if (numOfPackages > 1) {
+          bigPackagesPrice =
+              bigPackagesPrice + calculateBigPackagePrices(numOfPackages);
           bigPack += 1;
-        }else{
+        } else {
           smallPack += 1;
         }
-      }else{
+      } else {
         print("There is error on line $index with vlaue is $value");
       }
-
-
     });
 
     return {
-      "small packages" : smallPack,
-      "small packages price" : (smallPack * 0.050),
-      "big packages" : bigPack,
-      "big packages price" : bigPackagesPrice,
+      "small packages": smallPack,
+      "small packages price": (smallPack * 0.050),
+      "big packages": bigPack,
+      "big packages price": bigPackagesPrice,
     };
   }
 
-  double calculateBigPackagePrices(int numOfPackages){
-    if(numOfPackages < 5){
+  double calculateBigPackagePrices(int numOfPackages) {
+    if (numOfPackages < 5) {
       return numOfPackages * 0.150;
-    }else{
+    } else {
       int extraPackages = numOfPackages - 4;
       double bonus = (0.025 * extraPackages);
       bonusPrice = bonusPrice + bonus;
