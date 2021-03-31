@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:packages_cal_app/pdf_preview_screen.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pdfWidgets;
@@ -51,7 +52,7 @@ class _MyHomePageState extends State<MyHomePage> {
   writeOnPdf() {
     pdf.addPage(
       pdfWidgets.MultiPage(
-        pageFormat: PdfPageFormat.a4,
+        pageFormat: PdfPageFormat.a5,
         margin: pdfWidgets.EdgeInsets.all(32),
         build: (pdfWidgets.Context context){
           return <pdfWidgets.Widget>  [
@@ -66,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
               text: "A paragraph is a series of related sentences developing a central idea, called the topic. Try to think about paragraphs in terms of thematic unity: a paragraph is a sentence or a group of sentences that supports one central, unified idea. Paragraphs add one idea at a time to your broader argument.",
             ),
             pdfWidgets.Header(
-              level: 1,
+              level: 5,
               child: pdfWidgets.Text("Second Heading"),
             ),
             pdfWidgets.Paragraph(
@@ -82,14 +83,17 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Future savePdf() async{
+  Future<String> savePdf() async{
     Directory documentDirectory = await getApplicationDocumentsDirectory();
 
     String documentPath = documentDirectory.path;
 
+    print("dose this file exists ? ${File("$documentPath/example.pdf").existsSync()}");
+
     File file = File("$documentPath/example.pdf");
 
     file.writeAsBytesSync(pdf.save());
+    return "$documentPath/example.pdf";
   }
 
   TextEditingController _controller = TextEditingController();
@@ -228,6 +232,17 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
         ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.share),
+        onPressed: ()async{
+          writeOnPdf();
+          await savePdf();
+
+          String fullPath = await savePdf();
+
+          Navigator.push(context, MaterialPageRoute(builder: (context)=> PdfPreviewScreen(path: fullPath,)));
+        },
       ),
     );
   }
