@@ -55,28 +55,40 @@ class _MyHomePageState extends State<MyHomePage> {
         pageFormat: PdfPageFormat.a5,
         margin: pdfWidgets.EdgeInsets.all(32),
         build: (pdfWidgets.Context context){
-          return <pdfWidgets.Widget>  [
-            pdfWidgets.Header(
-              level: 0,
-              child: pdfWidgets.Text("Easy Approach Document"),
-            ),
-            pdfWidgets.Paragraph(
-              text: "A paragraph is a series of related sentences developing a central idea, called the topic. Try to think about paragraphs in terms of thematic unity: a paragraph is a sentence or a group of sentences that supports one central, unified idea. Paragraphs add one idea at a time to your broader argument.",
-            ),
-            pdfWidgets.Paragraph(
-              text: "A paragraph is a series of related sentences developing a central idea, called the topic. Try to think about paragraphs in terms of thematic unity: a paragraph is a sentence or a group of sentences that supports one central, unified idea. Paragraphs add one idea at a time to your broader argument.",
-            ),
-            pdfWidgets.Header(
-              level: 5,
-              child: pdfWidgets.Text("Second Heading"),
-            ),
-            pdfWidgets.Paragraph(
-              text: "A paragraph is a series of related sentences developing a central idea, called the topic. Try to think about paragraphs in terms of thematic unity: a paragraph is a sentence or a group of sentences that supports one central, unified idea. Paragraphs add one idea at a time to your broader argument.",
-            ),
-            pdfWidgets.Paragraph(
-              text: "A paragraph is a series of related sentences developing a central idea, called the topic. Try to think about paragraphs in terms of thematic unity: a paragraph is a sentence or a group of sentences that supports one central, unified idea. Paragraphs add one idea at a time to your broader argument.",
-            ),
+          return [
+          pdfWidgets.Wrap(
+            children: [
+              Image(),
+              pdfWidgets.Header(
+                level: 0,
+                child: pdfWidgets.Text("Easy Approach Document"),
+              ),
+              pdfWidgets.Paragraph(
+                text: "A paragraph is a series of related sentences developing a central idea, called the topic. Try to think about paragraphs in terms of thematic unity: a paragraph is a sentence or a group of sentences that supports one central, unified idea. Paragraphs add one idea at a time to your broader argument.",
+              ),
+              pdfWidgets.Paragraph(
+                text: "A paragraph is a series of related sentences developing a central idea, called the topic. Try to think about paragraphs in terms of thematic unity: a paragraph is a sentence or a group of sentences that supports one central, unified idea. Paragraphs add one idea at a time to your broader argument.",
+              ),
+              pdfWidgets.Header(
+                level: 0,
+                child: pdfWidgets.Text("Second Heading"),
+              ),
+
+              pdfWidgets.Paragraph(
+                text: "A paragraph is a series of related sentences developing a central idea, called the topic. Try to think about paragraphs in terms of thematic unity: a paragraph is a sentence or a group of sentences that supports one central, unified idea. Paragraphs add one idea at a time to your broader argument.",
+                style: pdfWidgets.TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+              // pdfWidgets.SpanningWidget,
+              // pdfWidgets.SvgImage(
+              //   svg: 'logo/logo-small.png',
+              //   clip: true,
+              // ),
+            ],
+          ),
           ];
+
         },
         
       ),
@@ -85,10 +97,12 @@ class _MyHomePageState extends State<MyHomePage> {
 
   Future<String> savePdf() async{
     Directory documentDirectory = await getApplicationDocumentsDirectory();
-
     String documentPath = documentDirectory.path;
+    bool isFileExists = await File("$documentPath/example.pdf").exists();
 
-    print("dose this file exists ? ${File("$documentPath/example.pdf").existsSync()}");
+    if(isFileExists){
+      await File("$documentPath/example.pdf").delete();
+    }
 
     File file = File("$documentPath/example.pdf");
 

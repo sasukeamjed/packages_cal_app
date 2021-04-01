@@ -9,6 +9,21 @@ class PdfPreviewScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return PDFViewerScaffold(
+      appBar: AppBar(
+        title: Text("Document"),
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: Icon(Icons.share),
+          ),
+          IconButton(
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+            icon: Icon(Icons.arrow_back),
+          ),
+        ],
+      ),
       path: path,
     );
   }
