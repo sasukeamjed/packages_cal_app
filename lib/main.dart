@@ -2,6 +2,8 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 import 'package:packages_cal_app/pdf_preview_screen.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
@@ -49,64 +51,360 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   final pdf = pdfWidgets.Document();
 
-  writeOnPdf() {
+  Future<File> getImageFileFromAssets(String path) async {
+    final byteData = await rootBundle.load('logo/$path');
+
+    final file = File('${(await getTemporaryDirectory()).path}/$path');
+    await file.writeAsBytes(byteData.buffer
+        .asUint8List(byteData.offsetInBytes, byteData.lengthInBytes));
+
+    return file;
+  }
+
+  writeOnPdf(File file) {
+
+    final image = pdfWidgets.MemoryImage(
+      file.readAsBytesSync(),
+    );
+    final DateTime now = DateTime.now();
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
+    final String formatted = formatter.format(now);
+
+    final date = DateTime.now();
     pdf.addPage(
       pdfWidgets.MultiPage(
         pageFormat: PdfPageFormat.a5,
-        margin: pdfWidgets.EdgeInsets.all(32),
-        build: (pdfWidgets.Context context){
+        margin: pdfWidgets.EdgeInsets.all(15),
+        build: (pdfWidgets.Context context) {
           return [
-          pdfWidgets.Wrap(
-            children: [
-              Image(),
-              pdfWidgets.Header(
-                level: 0,
-                child: pdfWidgets.Text("Easy Approach Document"),
+            pdfWidgets.Center(
+              child: pdfWidgets.Column(
+                children: [
+                  pdfWidgets.Image(image, width: 100, height: 100),
+                  pdfWidgets.SizedBox(height: 10),
+                  pdfWidgets.Text("Date is : $formatted"),
+                ],
               ),
-              pdfWidgets.Paragraph(
-                text: "A paragraph is a series of related sentences developing a central idea, called the topic. Try to think about paragraphs in terms of thematic unity: a paragraph is a sentence or a group of sentences that supports one central, unified idea. Paragraphs add one idea at a time to your broader argument.",
-              ),
-              pdfWidgets.Paragraph(
-                text: "A paragraph is a series of related sentences developing a central idea, called the topic. Try to think about paragraphs in terms of thematic unity: a paragraph is a sentence or a group of sentences that supports one central, unified idea. Paragraphs add one idea at a time to your broader argument.",
-              ),
-              pdfWidgets.Header(
-                level: 0,
-                child: pdfWidgets.Text("Second Heading"),
-              ),
-
-              pdfWidgets.Paragraph(
-                text: "A paragraph is a series of related sentences developing a central idea, called the topic. Try to think about paragraphs in terms of thematic unity: a paragraph is a sentence or a group of sentences that supports one central, unified idea. Paragraphs add one idea at a time to your broader argument.",
-                style: pdfWidgets.TextStyle(
-                  fontSize: 18,
+            ),
+            pdfWidgets.SizedBox(height: 10),
+            pdfWidgets.Table(
+              border: pdfWidgets.TableBorder(
+                verticalInside: pdfWidgets.BorderSide(
+                  style: pdfWidgets.BorderStyle.solid,
+                  width: 1,
                 ),
               ),
+              children: <pdfWidgets.TableRow>[
+                pdfWidgets.TableRow(
+                  decoration: pdfWidgets.BoxDecoration(
+                    // image: pdfWidgets.DecorationImage.provider(image: pdfWidgets.ImageProvider),
+                    border: pdfWidgets.Border(
+                      right: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      left: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      bottom: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      top: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                    ),
+                  ),
+                  children: <pdfWidgets.Widget>[
+                    pdfWidgets.Padding(
+                      padding: pdfWidgets.EdgeInsets.all(10),
+                      child: pdfWidgets.Text(''),
+                    ),
+
+                    pdfWidgets.Padding(
+                      padding: pdfWidgets.EdgeInsets.only(top: 10, bottom: 10),
+                      child: pdfWidgets.Text('Manal AlButrani', textAlign: pdfWidgets.TextAlign.center,),
+                    ),
+                    pdfWidgets.Padding(
+                      padding: pdfWidgets.EdgeInsets.only(top: 10,),
+                      child: pdfWidgets.Text('Bayan AlButrani', textAlign: pdfWidgets.TextAlign.center,),
+                    ),
+                    pdfWidgets.Padding(
+                      padding: pdfWidgets.EdgeInsets.only(top: 10,),
+                      child: pdfWidgets.Text('Balqees AlButrani', textAlign: pdfWidgets.TextAlign.center,),
+                    ),
+                    pdfWidgets.Padding(
+                      padding: pdfWidgets.EdgeInsets.only(top: 10,),
+                      child: pdfWidgets.Text('Hajer AlAnqoodi', textAlign: pdfWidgets.TextAlign.center,),
+                    ),
+                    pdfWidgets.Padding(
+                      padding: pdfWidgets.EdgeInsets.only(top: 10,),
+                      child: pdfWidgets.Text('Marwa AlAnqoodi', textAlign: pdfWidgets.TextAlign.center,),
+                    ),
+                    pdfWidgets.Padding(
+                      padding: pdfWidgets.EdgeInsets.only(top: 10,),
+                      child: pdfWidgets.Text('Amani AlSabahi', textAlign: pdfWidgets.TextAlign.center,),
+                    ),
+
+                  ],
+                ),
+                pdfWidgets.TableRow(
+                  decoration: pdfWidgets.BoxDecoration(
+                    // image: pdfWidgets.DecorationImage.provider(image: pdfWidgets.ImageProvider),
+                    border: pdfWidgets.Border(
+                      right: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      left: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      bottom: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      top: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                    ),
+                  ),
+                  children: <pdfWidgets.Widget>[
+                    pdfWidgets.Padding(
+                      padding: pdfWidgets.EdgeInsets.all(10),
+                      child: pdfWidgets.Text('no of small pckgs', textAlign: pdfWidgets.TextAlign.center),
+                    ),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                  ],
+                ),
+                pdfWidgets.TableRow(
+                  decoration: pdfWidgets.BoxDecoration(
+                    // image: pdfWidgets.DecorationImage.provider(image: pdfWidgets.ImageProvider),
+                    border: pdfWidgets.Border(
+                      right: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      left: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      bottom: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      top: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                    ),
+                  ),
+                  children: <pdfWidgets.Widget>[
+                    pdfWidgets.Padding(
+                      padding: pdfWidgets.EdgeInsets.all(10),
+                      child: pdfWidgets.Text('no of big pckgs', textAlign: pdfWidgets.TextAlign.center),
+                    ),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                  ],
+                ),
+                pdfWidgets.TableRow(
+                  decoration: pdfWidgets.BoxDecoration(
+                    // image: pdfWidgets.DecorationImage.provider(image: pdfWidgets.ImageProvider),
+                    border: pdfWidgets.Border(
+                      right: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      left: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      bottom: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      top: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                    ),
+                  ),
+                  children: <pdfWidgets.Widget>[
+                    pdfWidgets.Padding(
+                      padding: pdfWidgets.EdgeInsets.all(10),
+                      child: pdfWidgets.Text('Total Packages', textAlign: pdfWidgets.TextAlign.center),
+                    ),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                  ],
+                ),
+                pdfWidgets.TableRow(
+                  decoration: pdfWidgets.BoxDecoration(
+                    // image: pdfWidgets.DecorationImage.provider(image: pdfWidgets.ImageProvider),
+                    border: pdfWidgets.Border(
+                      right: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      left: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      bottom: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      top: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                    ),
+                  ),
+                  children: <pdfWidgets.Widget>[
+                    pdfWidgets.Padding(
+                      padding: pdfWidgets.EdgeInsets.all(10),
+                      child: pdfWidgets.Text('Total Price of small Pkgs', textAlign: pdfWidgets.TextAlign.center),
+                    ),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                  ],
+                ),
+                pdfWidgets.TableRow(
+                  decoration: pdfWidgets.BoxDecoration(
+                    // image: pdfWidgets.DecorationImage.provider(image: pdfWidgets.ImageProvider),
+                    border: pdfWidgets.Border(
+                      right: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      left: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      bottom: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      top: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                    ),
+                  ),
+                  children: <pdfWidgets.Widget>[
+                    pdfWidgets.Padding(
+                      padding: pdfWidgets.EdgeInsets.all(10),
+                      child: pdfWidgets.Text('Total Price of big Pkgs', textAlign: pdfWidgets.TextAlign.center),
+                    ),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                  ],
+                ),
+                pdfWidgets.TableRow(
+                  decoration: pdfWidgets.BoxDecoration(
+                    // image: pdfWidgets.DecorationImage.provider(image: pdfWidgets.ImageProvider),
+                    border: pdfWidgets.Border(
+                      right: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      left: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      bottom: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      top: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                    ),
+                  ),
+                  children: <pdfWidgets.Widget>[
+                    pdfWidgets.Padding(
+                      padding: pdfWidgets.EdgeInsets.all(10),
+                      child: pdfWidgets.Text('The Bonus Price', textAlign: pdfWidgets.TextAlign.center),
+                    ),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                  ],
+                ),
+                pdfWidgets.TableRow(
+                  decoration: pdfWidgets.BoxDecoration(
+                    // image: pdfWidgets.DecorationImage.provider(image: pdfWidgets.ImageProvider),
+                    border: pdfWidgets.Border(
+                      right: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      left: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      bottom: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                      top: pdfWidgets.BorderSide(
+                        style: pdfWidgets.BorderStyle.solid,
+                      ),
+                    ),
+                  ),
+                  children: <pdfWidgets.Widget>[
+                    pdfWidgets.Padding(
+                      padding: pdfWidgets.EdgeInsets.all(10),
+                      child: pdfWidgets.Text('The Total Price of Pckgs', textAlign: pdfWidgets.TextAlign.center),
+                    ),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                    pdfWidgets.Text(''),
+                  ],
+                ),
+              ],
+              // children: [
+
+              // pdfWidgets.Header(
+              //   level: 0,
+              //   child: pdfWidgets.Text("Easy Approach Document"),
+              // ),
+              // pdfWidgets.Paragraph(
+              //   text: "A paragraph is a series of related sentences developing a central idea, called the topic. Try to think about paragraphs in terms of thematic unity: a paragraph is a sentence or a group of sentences that supports one central, unified idea. Paragraphs add one idea at a time to your broader argument.",
+              // ),
+              // pdfWidgets.Paragraph(
+              //   text: "A paragraph is a series of related sentences developing a central idea, called the topic. Try to think about paragraphs in terms of thematic unity: a paragraph is a sentence or a group of sentences that supports one central, unified idea. Paragraphs add one idea at a time to your broader argument.",
+              // ),
+              // pdfWidgets.Header(
+              //   level: 0,
+              //   child: pdfWidgets.Text("Second Heading"),
+              // ),
+              //
+              // pdfWidgets.Paragraph(
+              //   text: "A paragraph is a series of related sentences developing a central idea, called the topic. Try to think about paragraphs in terms of thematic unity: a paragraph is a sentence or a group of sentences that supports one central, unified idea. Paragraphs add one idea at a time to your broader argument.",
+              //   style: pdfWidgets.TextStyle(
+              //     fontSize: 18,
+              //   ),
+              // ),
               // pdfWidgets.SpanningWidget,
               // pdfWidgets.SvgImage(
               //   svg: 'logo/logo-small.png',
               //   clip: true,
               // ),
-            ],
-          ),
+              // ],
+            ),
           ];
-
         },
-        
       ),
     );
   }
 
-  Future<String> savePdf() async{
+  Future<String> savePdf() async {
     Directory documentDirectory = await getApplicationDocumentsDirectory();
     String documentPath = documentDirectory.path;
     bool isFileExists = await File("$documentPath/example.pdf").exists();
 
-    if(isFileExists){
+    if (isFileExists) {
       await File("$documentPath/example.pdf").delete();
     }
 
     File file = File("$documentPath/example.pdf");
 
-    file.writeAsBytesSync(pdf.save());
+    file.writeAsBytesSync(await pdf.save());
     return "$documentPath/example.pdf";
   }
 
@@ -119,6 +417,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    // final file = File('logo/logo-small.png').exists();
+    // file.then((value) => print(value));
     return Scaffold(
       appBar: AppBar(
         title: Text("Packages Calculator App"),
@@ -249,13 +549,21 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         child: Icon(Icons.share),
-        onPressed: ()async{
-          writeOnPdf();
+        onPressed: () async {
+          File file = await getImageFileFromAssets('logo-small.png');
+
+          print(await file.exists());
+          writeOnPdf(file);
           await savePdf();
-
+          //
           String fullPath = await savePdf();
-
-          Navigator.push(context, MaterialPageRoute(builder: (context)=> PdfPreviewScreen(path: fullPath,)));
+          //
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => PdfPreviewScreen(
+                        path: fullPath,
+                      )));
         },
       ),
     );
